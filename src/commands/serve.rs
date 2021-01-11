@@ -13,11 +13,11 @@ use sysinfo::{get_current_pid, SystemExt, ProcessExt};
 
 use crate::http::proxy_server;
 use crate::php::php_server;
-use crate::php::structs::{PhpServerSapi, ProcessInfo};
+use crate::php::structs::{PhpServerSapi, ServerInfo};
 use crate::utils::current_process_name;
 use crate::utils::network::find_available_port;
 use crate::utils::network::parse_default_port;
-use crate::utils::project_folder::get_rymfony_project_directory;
+use crate::utils::project_directory::get_rymfony_project_directory;
 
 const DEFAULT_PORT: &str = "8000";
 
@@ -84,7 +84,7 @@ fn serve_foreground(args: &ArgMatches) {
     if rymfony_pid_file.exists() {
         // Check if process is rymfony and exit if true.
 
-        let infos: ProcessInfo = serde_json::from_str(read_to_string(&rymfony_pid_file).unwrap().as_str()).expect("Unable to unserialize data from PID file.");
+        let infos: ServerInfo = serde_json::from_str(read_to_string(&rymfony_pid_file).unwrap().as_str()).expect("Unable to unserialize data from PID file.");
 
         let mut system = sysinfo::System::new_all();
         system.refresh_all();
@@ -92,6 +92,7 @@ fn serve_foreground(args: &ArgMatches) {
         for (pid, proc_) in system.get_processes() {
             if pid == &infos.pid() && proc_.exe().to_str().unwrap().ends_with("rymfony") {
                 found = true;
+                break;
             }
         }
 
@@ -122,7 +123,7 @@ fn serve_foreground(args: &ArgMatches) {
     let scheme = if args.is_present("no-tls") {
         "http".to_string()
     } else { "https".to_string() };
-    let pid_info = ProcessInfo::new(pid, port, scheme, "Web Server".to_string(), current_process_name::get(), args_str);
+    let pid_info = ServerInfo::new(pid, port, scheme, "Web Server".to_string(), current_process_name::get(), args_str);
 
     //Serialize
     let serialized = serde_json::to_string_pretty(&pid_info).unwrap();

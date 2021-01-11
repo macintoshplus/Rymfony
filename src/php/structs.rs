@@ -251,7 +251,7 @@ impl PhpBinary {
 
 
 #[derive(Hash, Eq, PartialEq, Debug, Serialize, SerdeDeserialize)]
-pub(crate) struct ProcessInfo {
+pub(crate) struct ServerInfo {
     pid: i32,
     port: u16,
     scheme: String,
@@ -260,15 +260,15 @@ pub(crate) struct ProcessInfo {
     args: Vec<String>,
 }
 
-impl Display for ProcessInfo {
+impl Display for ServerInfo {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "pid: {}, port: {}, scheme: {}, name: {}, command: {}, args: {}", self.pid, self.port, self.scheme, self.name, self.command, self.args.join(" "))
     }
 }
 
-impl ProcessInfo {
-    pub(crate) fn new(pid: i32, port: u16, scheme: String, name: String, command: String, args: Vec<String>) -> ProcessInfo {
-        ProcessInfo {
+impl ServerInfo {
+    pub(crate) fn new(pid: i32, port: u16, scheme: String, name: String, command: String, args: Vec<String>) -> ServerInfo {
+        ServerInfo {
             pid,
             port,
             scheme: scheme.clone(),

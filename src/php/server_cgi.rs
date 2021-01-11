@@ -4,7 +4,7 @@ use std::process::Child;
 use std::process::Command;
 use std::process::Stdio;
 use std::fs::File;
-use crate::utils::project_folder::get_rymfony_project_directory;
+use crate::utils::project_directory::get_rymfony_project_directory;
 
 const CGI_DEFAULT_PORT: u16 = 65535;
 

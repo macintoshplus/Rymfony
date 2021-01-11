@@ -8,15 +8,15 @@ use dirs::home_dir;
 use sha2::Digest;
 
 #[derive(Debug)]
-struct ProjectFolderError(String);
+struct ProjectDirectoryError(String);
 
-impl fmt::Display for ProjectFolderError {
+impl fmt::Display for ProjectDirectoryError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "An error occured: {}", self.0)
     }
 }
 
-impl Error for ProjectFolderError {}
+impl Error for ProjectDirectoryError {}
 
 pub(crate) fn get_rymfony_project_directory() -> Result<PathBuf, Box<dyn std::error::Error>> {
     let home = home_dir().unwrap().display().to_string();
@@ -42,5 +42,5 @@ pub(crate) fn get_rymfony_project_directory() -> Result<PathBuf, Box<dyn std::er
         return Ok(rymfony_project_path);
     }
 
-    Err(Box::new(ProjectFolderError("Cannot find the \"HOME\" directory".into())))
+    Err(Box::new(ProjectDirectoryError("Cannot find the \"HOME\" directory".into())))
 }

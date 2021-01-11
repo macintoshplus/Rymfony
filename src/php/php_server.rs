@@ -8,8 +8,8 @@ use crate::php::binaries;
 use crate::php::server_cgi::start as start_cgi;
 use crate::php::server_fpm::start as start_fpm;
 use crate::php::server_native::start as start_native;
-use crate::php::structs::{PhpServerSapi, ProcessInfo};
-use crate::utils::project_folder::get_rymfony_project_directory;
+use crate::php::structs::{PhpServerSapi, ServerInfo};
+use crate::utils::project_directory::get_rymfony_project_directory;
 #[cfg(not(target_os = "windows"))]
 use crate::utils::stop_process;
 use std::str::FromStr;
@@ -85,7 +85,7 @@ pub(crate) fn start() -> PhpServer {
         process_pid.to_string()
     } else { "0".to_string() };
 
-    let pid_info = ProcessInfo::new(i32::from_str(pidstr.as_str()).unwrap(), php_server.port, "".to_string(), format!("{}", php_server.sapi), php_bin.clone(), args_str);
+    let pid_info = ServerInfo::new(i32::from_str(pidstr.as_str()).unwrap(), php_server.port, "".to_string(), format!("{}", php_server.sapi), php_bin.clone(), args_str);
 
     //Serialize
     let serialized = serde_json::to_string_pretty(&pid_info).unwrap();

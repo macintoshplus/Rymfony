@@ -18,7 +18,7 @@ use crate::{php::structs::PhpServerSapi};
 use crate::php::php_server::PhpServer;
 #[cfg(not(target_family = "windows"))]
 use crate::utils::network::find_available_port;
-use crate::utils::project_folder::get_rymfony_project_directory;
+use crate::utils::project_directory::get_rymfony_project_directory;
 
 // Possible values: alert, error, warning, notice, debug
 #[cfg(not(target_family = "windows"))]
