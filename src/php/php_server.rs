@@ -94,7 +94,7 @@ pub(crate) fn start() -> PhpServer {
     let mut versions_file = File::create(&server_pid_file).unwrap();
 
     versions_file.write_all(serialized.as_bytes())
-        .expect("Could not write Process informations to JSON file.");
+        .expect("Could not write Process information to JSON file.");
 
 
     php_server

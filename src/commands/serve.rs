@@ -80,12 +80,11 @@ pub(crate) fn serve(args: &ArgMatches) {
 fn serve_foreground(args: &ArgMatches) {
     let path = get_rymfony_project_directory().unwrap();
     let rymfony_pid_file = path.join("rymfony.pid");
-    debug!("Search PID FILE {}", rymfony_pid_file.to_str().unwrap());
+    debug!("Looking for PID file in \"{}\".", rymfony_pid_file.to_str().unwrap());
     if rymfony_pid_file.exists() {
-        //Check if process is rymfony and exit if true.
-        debug!("Information file {} found", rymfony_pid_file.to_str().unwrap());
+        // Check if process is rymfony and exit if true.
 
-        let infos: ProcessInfo = serde_json::from_str(read_to_string(&rymfony_pid_file).unwrap().as_str()).expect("Unable to unserialize data");
+        let infos: ProcessInfo = serde_json::from_str(read_to_string(&rymfony_pid_file).unwrap().as_str()).expect("Unable to unserialize data from PID file.");
 
         let mut system = sysinfo::System::new_all();
         system.refresh_all();
@@ -97,7 +96,7 @@ fn serve_foreground(args: &ArgMatches) {
         }
 
         if found {
-            println!("The server is already running and listen on {}://127.0.0.1:{}", infos.scheme(), infos.port());
+            info!("The server is already running and listening to {}://127.0.0.1:{}", infos.scheme(), infos.port());
             return;
         }
 
@@ -186,9 +185,9 @@ fn serve_background(args: &ArgMatches) {
         .expect("Failed to start server as a background process");
 
     let pid = subprocess.id();
-    let project_folder = get_rymfony_project_directory().expect("Unable to get Rymfony folder for this project");
+    let project_directory = get_rymfony_project_directory().expect("Unable to get Rymfony directory for this project");
 
-    let mut file = File::create(project_folder.join(".pid")).expect("Cannot create PID file");
+    let mut file = File::create(project_directory.join(".pid")).expect("Cannot create PID file");
     file.write_all(pid.to_string().as_ref())
         .expect("Cannot write to PID file");
 

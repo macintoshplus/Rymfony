@@ -193,7 +193,6 @@ fn change_port(original_content: &str, new_port: &u16) -> String {
     let mut found = false;
     let mut content = original_content.to_string();
     for caps in re.captures_iter(original_content) {
-        println!("{:?}", caps);
         let captures = regex_port.captures(&caps[2]);
         if captures.is_none() || found {
             content = content.replace(&caps[0], format!(";{}", &caps[0]).as_str());
