@@ -12,6 +12,12 @@ use crate::php::structs::{PhpServerSapi, ServerInfo};
 use crate::utils::project_directory::get_rymfony_project_directory;
 #[cfg(not(target_os = "windows"))]
 use crate::utils::stop_process;
+
+use std::process;
+use std::thread;
+use std::time;
+use std::path::PathBuf;
+use is_executable::IsExecutable;
 use std::str::FromStr;
 
 pub(crate) struct PhpServer {
@@ -35,6 +41,14 @@ impl PhpServer {
 
 pub(crate) fn start() -> PhpServer {
     let php_bin = binaries::get_project_version();
+
+    let phpbin_path = PathBuf::from(php_bin.as_str());
+
+    if !phpbin_path.is_executable() {
+        error!("PHP Binary not found or not executable: {}", php_bin.as_str());
+        info!("Execute rymfony php:list --refresh to solve this issue");
+        return PhpServer::new(0, PhpServerSapi::Unknown);
+    }
 
     let (php_server, mut process) =
         if php_bin.contains("-fpm") && cfg!(not(target_family = "windows")) {
