@@ -14,6 +14,7 @@ use sysinfo::{get_current_pid, SystemExt, ProcessExt};
 use crate::http::proxy_server;
 use crate::php::php_server;
 use crate::php::structs::{PhpServerSapi, ServerInfo};
+use crate::php::php_server::PhpServer;
 use crate::utils::current_process_name;
 use crate::utils::network::find_available_port;
 use crate::utils::network::parse_default_port;
@@ -109,8 +110,36 @@ fn serve_foreground(args: &ArgMatches) {
     }
 
     info!("Starting PHP...");
+    let port = find_available_port(parse_default_port(args.value_of("port").unwrap_or(DEFAULT_PORT), DEFAULT_PORT));
 
-    let php_server = php_server::start();
+    let mut document_root = get_document_root(args.value_of("document-root").unwrap_or("").to_string());
+    if document_root.ends_with('/') { document_root.pop(); }
+    if document_root.ends_with('\\') { document_root.pop(); }
+    document_root.push_str(if cfg!(target_family = "windows") { "\\" } else { "/" });
+    let doc_root_path = PathBuf::from(document_root.as_str());
+    let scripts = vec!["index.php", "app_dev.php", "app.php"];
+    let script_filename = if args.is_present("passthru") {
+        args.value_of("passthru").unwrap_or("index.php").to_string()
+    } else {
+        for script in scripts {
+            let php_entrypoint_path = doc_root_path.join(script);
+            if php_entrypoint_path.is_file() {
+                script.to_string();
+            }
+        }
+        "index.php".to_string()
+    };
+
+    let php_entrypoint_path = doc_root_path.join(script_filename.as_str());
+    let php_server = if !php_entrypoint_path.is_file() {
+        warn!("No PHP entrypoint file");
+        PhpServer::new(0, PhpServerSapi::Unknown)
+    } else {
+        info!("Starting PHP...");
+
+        php_server::start()
+    };
+
 
     let sapi = match php_server.sapi() {
         PhpServerSapi::FPM => "FPM",
@@ -118,7 +147,12 @@ fn serve_foreground(args: &ArgMatches) {
         PhpServerSapi::CGI => "CGI",
         PhpServerSapi::Unknown => "?",
     };
-    info!("PHP started with module {}", sapi);
+    if sapi == "?" {
+        info!("Skip PHP start");
+    } else {
+        info!("PHP started with module {}", sapi);
+        info!("PHP entrypoint file: {}", &script_filename);
+    }
 
     info!("Starting HTTP server...");
 

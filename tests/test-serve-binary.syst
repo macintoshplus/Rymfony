@@ -1,7 +1,5 @@
 --RUN-ON-UNIX--
 --SETUP--
-#!/bin/bash
-echo stop server
 ../Rymfony/target/debug/rymfony stop
 if [ -f "$WORKING_DIR/file.pdf" ]
 then
@@ -11,9 +9,9 @@ fi
 --TEST--
 #!/bin/bash
 echo $WORKING_DIR
-../Rymfony/target/debug/rymfony serve -d --document-root tests/assets/php_serve_binary > $WORKING_DIR/server.log 2>&1
+../Rymfony/target/debug/rymfony serve -d --document-root $WORKING_DIR/../assetsphp_serve_binary > $WORKING_DIR/server.log 2>&1
 sleep 2
-curl --request GET \
+curl -v --request GET \
   --cacert $HOME/.rymfony/ca_tls_cert.pem \
   --url https://127.0.0.1:8000/ \
   --header 'Accept: *' \
@@ -25,4 +23,4 @@ curl --request GET \
 sha256sum $WORKING_DIR/file.pdf
 
 --EXPECTF--
-110b3925e9f381a2304408788f733ead55ad727b466b7ab66ebe46b9b3382d66 .*/file\.pdf
+110b3925e9f381a2304408788f733ead55ad727b466b7ab66ebe46b9b3382d66 .*
