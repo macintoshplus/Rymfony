@@ -95,7 +95,13 @@ fn serve_foreground(args: &ArgMatches) {
             #[cfg(target_family = "windows")]
                 let process_pid = *pid as i32;
 
-            if &process_pid == &infos.pid() && proc_.exe().to_str().unwrap().ends_with("rymfony") {
+            let mut pname = proc_.exe().to_str().unwrap();
+            let pname_lower = pname.to_lowercase();
+            pname = pname_lower.as_str();
+
+            let exe_rymfony_name = if cfg!(not(target_family = "windows")) { "rymfony" } else { "rymfony.exe" };
+
+            if &process_pid == &infos.pid() && pname.ends_with(exe_rymfony_name) {
                 info!("The server is already running and listening to {}://127.0.0.1:{}", infos.scheme(), infos.port());
                 return;
             }
