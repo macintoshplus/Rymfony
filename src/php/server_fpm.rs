@@ -1,12 +1,15 @@
 #[cfg(not(target_family = "windows"))]
 use std::{fs::File, io::prelude::*, process::Command};
+#[cfg(not(target_family = "windows"))]
 use std::error::Error;
+#[cfg(not(target_family = "windows"))]
 use std::fmt;
+#[cfg(not(target_family = "windows"))]
 use std::fs::{read_to_string, remove_file};
 use std::process::Child;
 #[cfg(not(target_family = "windows"))]
 use std::process::Stdio;
-
+#[cfg(not(target_family = "windows"))]
 use regex::{Regex, RegexBuilder};
 #[cfg(not(target_family = "windows"))]
 use users::{get_current_gid, get_current_uid};
@@ -18,6 +21,7 @@ use crate::{php::structs::PhpServerSapi};
 use crate::php::php_server::PhpServer;
 #[cfg(not(target_family = "windows"))]
 use crate::utils::network::find_available_port;
+#[cfg(not(target_family = "windows"))]
 use crate::utils::project_directory::get_rymfony_project_directory;
 
 // Possible values: alert, error, warning, notice, debug
@@ -151,18 +155,20 @@ pub(crate) fn start(php_bin: String) -> (PhpServer, Child) {
 
     panic!("Could not start php-fpm.");
 }
-
+#[cfg(not(target_family = "windows"))]
 #[derive(Debug)]
 struct ReadPortError(String);
 
+#[cfg(not(target_family = "windows"))]
 impl fmt::Display for ReadPortError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "An error occured: {}", self.0)
     }
 }
-
+#[cfg(not(target_family = "windows"))]
 impl Error for ReadPortError {}
 
+#[cfg(not(target_family = "windows"))]
 fn read_port(content: &str) -> std::result::Result<u16, ReadPortError> {
     let re = RegexBuilder::new(r"^[ ]*listen[ ]?=[ ]?(.*)$").multi_line(true).build().unwrap();
     let regex_port = Regex::new(r"^(?:(?:127\.0\.0\.1|localhost):)?(\d{1,5})").unwrap();
@@ -185,7 +191,7 @@ fn read_port(content: &str) -> std::result::Result<u16, ReadPortError> {
     Ok(port_num)
 }
 
-
+#[cfg(not(target_family = "windows"))]
 fn change_port(original_content: &str, new_port: &u16) -> String {
     let re = RegexBuilder::new(r"^([ ]*listen[ ]?=[ ]?)(.*)$").multi_line(true).build().unwrap();
     let regex_port = Regex::new(r"^((?:(?:127\.0\.0\.1|localhost):)?)(\d{1,5})").unwrap();
@@ -210,7 +216,7 @@ fn change_port(original_content: &str, new_port: &u16) -> String {
     content
 }
 
-
+#[cfg(not(target_family = "windows"))]
 #[cfg(test)]
 mod tests {
     use super::*;

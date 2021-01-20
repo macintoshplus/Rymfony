@@ -88,19 +88,18 @@ fn serve_foreground(args: &ArgMatches) {
 
         let mut system = sysinfo::System::new_all();
         system.refresh_all();
-        let mut found = false;
         for (pid, proc_) in system.get_processes() {
-            if pid == &infos.pid() && proc_.exe().to_str().unwrap().ends_with("rymfony") {
-                found = true;
-                break;
+            #[cfg(not(target_family = "windows"))]
+                let process_pid = *pid;
+
+            #[cfg(target_family = "windows")]
+                let process_pid = *pid as i32;
+
+            if &process_pid == &infos.pid() && proc_.exe().to_str().unwrap().ends_with("rymfony") {
+                info!("The server is already running and listening to {}://127.0.0.1:{}", infos.scheme(), infos.port());
+                return;
             }
         }
-
-        if found {
-            info!("The server is already running and listening to {}://127.0.0.1:{}", infos.scheme(), infos.port());
-            return;
-        }
-
     }
 
     info!("Starting PHP...");
@@ -118,7 +117,12 @@ fn serve_foreground(args: &ArgMatches) {
     info!("Starting HTTP server...");
 
     let port = find_available_port(parse_default_port(args.value_of("port").unwrap_or(DEFAULT_PORT), DEFAULT_PORT));
-    let pid = get_current_pid().unwrap();
+
+    #[cfg(not(target_family = "windows"))]
+        let pid = get_current_pid().unwrap();
+    #[cfg(target_family = "windows")]
+        let pid = get_current_pid().unwrap() as i32;
+
     let args_str: Vec<String> = Vec::new();
     let scheme = if args.is_present("no-tls") {
         "http".to_string()
