@@ -5,6 +5,8 @@ Rymfony
 
 Rymfony is a work-in-progress command-line tool to mimic the behavior of the Symfony CLI binary.
 
+This fork is only for my personal usage.  
+
 ## Install
 
 ### Download latest builds
