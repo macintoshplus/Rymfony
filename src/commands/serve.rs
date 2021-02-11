@@ -109,7 +109,6 @@ fn serve_foreground(args: &ArgMatches) {
         }
     }
 
-    info!("Starting PHP...");
     let port = find_available_port(parse_default_port(args.value_of("port").unwrap_or(DEFAULT_PORT), DEFAULT_PORT));
 
     let mut document_root = get_document_root(args.value_of("document-root").unwrap_or("").to_string());
@@ -156,8 +155,6 @@ fn serve_foreground(args: &ArgMatches) {
 
     info!("Starting HTTP server...");
 
-    let port = find_available_port(parse_default_port(args.value_of("port").unwrap_or(DEFAULT_PORT), DEFAULT_PORT));
-
     #[cfg(not(target_family = "windows"))]
         let pid = get_current_pid().unwrap();
     #[cfg(target_family = "windows")]
@@ -177,14 +174,8 @@ fn serve_foreground(args: &ArgMatches) {
         .expect("Could not write Process informations to JSON file.");
 
 
-    let mut document_root = get_document_root(args.value_of("document-root").unwrap_or("").to_string());
-    if document_root.ends_with('/') { document_root.pop(); }
-    if document_root.ends_with('\\') { document_root.pop(); }
-    document_root.push_str(if cfg!(target_family = "windows") { "\\" } else { "/" });
-    let script_filename = args.value_of("passthru").unwrap_or("index.php").to_string();
 
     info!("Configured document root: {}", &document_root);
-    info!("PHP entrypoint file: {}", &script_filename);
 
     proxy_server::start(
         !args.is_present("no-tls"),
